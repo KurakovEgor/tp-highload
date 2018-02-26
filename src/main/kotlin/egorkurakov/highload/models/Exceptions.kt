@@ -7,5 +7,5 @@ class Exceptions {
     open class ClientErrorException : RuntimeException()
     class MethodNotAllowed : Exceptions.ClientErrorException()
     class NotFound : Exceptions.ClientErrorException()
-    class BadRequest : Exceptions.ClientErrorException()
+    class Forbidden : Exceptions.ClientErrorException()
 }
