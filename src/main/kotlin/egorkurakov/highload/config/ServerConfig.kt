@@ -11,32 +11,33 @@ class ServerConfig(configFile: File = defaultConfigFile) {
     val config = HashMap<String, String>()
 
     companion object {
-        val defaultConfigFile = File("./server.conf")
+//        val defaultConfigFile = File("./httpd.conf")
+        val defaultConfigFile = File("/etc/httpd.conf")
     }
 
     init {
         try {
-            configFile.readLines().forEach { val line = it.split("="); config[line[0]] = line[1] }
+            configFile.readLines().forEach { val line = it.split(" "); config[line[0]] = line[1] }
         } catch (ex: ClassCastException) {
-            throw InvalidConfig()
+            throw InvalidConfig("Class cast exception")
         } catch (ex: FileNotFoundException) {
-            throw InvalidConfig()
+            throw InvalidConfig("File not find")
         }
-        if (config["directory"] == null ) {
-            config["directory"] = System.getProperty("user.dir")
+        if (config["document_root"] == null ) {
+            config["document_root"] = System.getProperty("user.dir")
         }
         if (!isValid()) {
-            throw InvalidConfig()
+            throw InvalidConfig("Not valid config file", configFile)
         }
     }
 
     private fun isValid() : Boolean {
-        return config["port"] != null &&
-                config["threads"] != null &&
-                config["directory"] != null
+        return config["listen"] != null &&
+                config["cpu_limit"] != null &&
+                config["document_root"] != null
     }
 
-    class InvalidConfig : RuntimeException() {
+    class InvalidConfig(val description: String? = null, val configFile: File? = null) : RuntimeException() {
 
     }
 }

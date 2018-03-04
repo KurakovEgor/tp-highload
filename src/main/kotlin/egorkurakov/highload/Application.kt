@@ -9,16 +9,22 @@ import java.net.ServerSocket
 /**
  * Created by egor on 18.02.18.
  */
+
 fun main(args: Array<String>) = runBlocking {
     val config : Map<String, String>
     try {
         config = ServerConfig().config
     } catch (ex: ServerConfig.InvalidConfig) {
-        print("Invalid configuration file")
+        println("Invalid configuration file")
+        if (ex.description != null)
+            println(ex.description)
+        if (ex.configFile != null)
+            println(ex.configFile)
         return@runBlocking
     }
-    val threadPoolContext = newFixedThreadPoolContext(config["threads"]!!.toInt(),"server-coroutines")
-    val serverSocket = ServerSocket(config["port"]!!.toInt())
+    val threadPoolContext = newFixedThreadPoolContext(config["cpu_limit"]!!.toInt(),"server-coroutines")
+    val serverSocket = ServerSocket(config["listen"]!!.toInt())
+    println("Server started on port {$}")
     while (true) {
         val socketAccept = serverSocket.accept()
         launch (threadPoolContext){

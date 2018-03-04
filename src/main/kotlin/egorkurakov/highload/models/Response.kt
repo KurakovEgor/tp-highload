@@ -2,6 +2,7 @@ package egorkurakov.highload.models
 
 import java.io.File
 import java.net.Socket
+import java.nio.charset.Charset
 import java.util.*
 
 /**
@@ -14,23 +15,19 @@ class Response private constructor(private val code : Int,
 
     constructor(file: File, needToSendFile: Boolean = true) : this(200, "OK", needToSendFile, file) { }
 
-    constructor(clientErrorException: Exceptions.BadRequest) : this(400, "Bad Request") { }
-
-    constructor(clientErrorException: Exceptions.NotFound) : this(404, "Not Found") { }
-
-    constructor(clientErrorException: Exceptions.MethodNotAllowed) : this(405, "Method Not Allowed") { }
+    constructor(clientErrorException: Exceptions.ClientErrorException) : this(clientErrorException.code, clientErrorException.status) { }
 
     fun send(socket: Socket) {
         socket.getOutputStream().write(getHeader().toByteArray())
         if (needToSendFile) {
-            socket.getOutputStream().write(file?.readBytes())
+                socket.getOutputStream().write(file?.readBytes())
         }
 
 
     }
 
     private fun getHeader() : String {
-        return "HTTP/1.1 ${code} ${status} \r\n" +
+        return "HTTP/1.1 ${code} ${status}\r\n" +
                 "Date: ${Date()} \r\n" +
                 "Server: highload \r\n" +
                 "Connection: Close \r\n" +

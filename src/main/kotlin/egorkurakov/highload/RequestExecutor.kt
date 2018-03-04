@@ -13,32 +13,39 @@ import java.net.Socket
  */
 class RequestExecutor(val config: Map<String, String>) {
     fun executeRequest(socketAccept: Socket) {
-        val request = Request(BufferedReader(InputStreamReader(socketAccept.getInputStream())).readLine())
+        val request : Request
         val response : Response
-        if (!isValid(request.path)) {
-            response = Response(Exceptions.BadRequest())
+        try {
+            request = Request(BufferedReader(InputStreamReader(socketAccept.getInputStream())).readLine())
+        } catch (ex: Exceptions.MethodNotAllowed) {
+            response = Response(Exceptions.MethodNotAllowed())
             response.send(socketAccept)
             return
         }
-        val file = File(config["directory"] + request.path)
-
-        if (!file.isFile()) {
-            response = Response(Exceptions.NotFound())
+        if (!isValid(request.path)) {
+            response = Response(Exceptions.Forbidden())
             response.send(socketAccept)
             return
+        }
+        val file = File(config["document_root"] + request.path)
+        response = if (!file.isFile()) {
+            if (request.isIndex) {
+                Response(Exceptions.Forbidden())
+            } else {
+                Response(Exceptions.NotFound())
+            }
         } else {
             if (request.method == Request.Method.HEAD) {
-                response = Response(file, false)
+                Response(file, false)
             } else {
-                response = Response(file)
+                Response(file)
             }
-            response.send(socketAccept)
-            return
         }
+        response.send(socketAccept)
     }
 
     private fun isValid(path: String) : Boolean {
-        if(path.contains("..")) {
+        if(path.contains("../")) {
             return false
         }
         return true
