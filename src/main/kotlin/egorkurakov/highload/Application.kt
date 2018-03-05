@@ -25,7 +25,7 @@ fun main(args: Array<String>) = runBlocking {
     val threadPoolContext = newFixedThreadPoolContext(config["cpu_limit"]!!.toInt(),"server-coroutines")
     val port = config["listen"]
     val serverSocket = ServerSocket(port!!.toInt())
-    println("Server started on port $port")
+    println("Server started on port {$port}")
     while (true) {
         val socketAccept = serverSocket.accept()
         launch (threadPoolContext){
