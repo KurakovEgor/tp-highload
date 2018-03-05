@@ -10,6 +10,7 @@ ENV WORK /highload
 WORKDIR $WORK/
 
 ADD . .
+RUN gradle wrapper
 RUN ./gradlew build
 
 EXPOSE 80
