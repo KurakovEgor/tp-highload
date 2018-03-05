@@ -11,8 +11,8 @@ class ServerConfig(configFile: File = defaultConfigFile) {
     val config = HashMap<String, String>()
 
     companion object {
-//        val defaultConfigFile = File("./httpd.conf")
-        val defaultConfigFile = File("/etc/httpd.conf")
+        val defaultConfigFile = File("./httpd.conf")
+//        val defaultConfigFile = File("/etc/httpd.conf")
     }
 
     init {
